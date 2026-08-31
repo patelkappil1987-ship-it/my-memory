@@ -1,32 +1,1665 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<title>My Memory — Notes, Tasks & Calendar</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="styles.css">
-<script src="https://alcdn.msauth.net/browser/2.39.0/js/msal-browser.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>My Memory</title>
+
+<!-- Microsoft Authentication Library -->
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    background:#f5f6fa;
+    color:#202124;
+}
+
+header{
+    height:64px;
+    background:#fff;
+    border-bottom:1px solid #ddd;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+.logo{
+    font-size:20px;
+    font-weight:700;
+}
+
+.logo small{
+    display:block;
+    font-size:11px;
+    color:#777;
+    font-weight:400;
+}
+
+button{
+    border:0;
+    border-radius:8px;
+    padding:10px 16px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+}
+
+#loginBtn{
+    background:#2563eb;
+    color:white;
+}
+
+main{
+    max-width:1000px;
+    margin:30px auto;
+    padding:0 16px 100px;
+}
+
+h1{
+    font-size:28px;
+    margin:0 0 25px;
+}
+
+.tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:20px;
+    overflow:auto;
+}
+
+.tab{
+    background:white;
+    border:1px solid #ddd;
+}
+
+.tab.active{
+    background:#2563eb;
+    color:white;
+}
+
+.panel{
+    display:none;
+}
+
+.panel.active{
+    display:block;
+}
+
+.card{
+    background:white;
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:15px;
+}
+
+input,textarea,select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+    margin:6px 0 12px;
+    font-family:inherit;
+}
+
+textarea{
+    min-height:120px;
+    resize:vertical;
+}
+
+.primary{
+    background:#2563eb;
+    color:white;
+}
+
+.secondary{
+    background:#eee;
+    color:#222;
+}
+
+.danger{
+    background:#dc2626;
+    color:white;
+}
+
+.item{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:10px;
+}
+
+.item h3{
+    margin:0 0 6px;
+}
+
+.item p{
+    margin:5px 0;
+    white-space:pre-wrap;
+}
+
+.meta{
+    color:#777;
+    font-size:12px;
+}
+
+.actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+.status{
+    margin-top:8px;
+    font-size:13px;
+    color:#666;
+}
+
+.empty{
+    text-align:center;
+    color:#777;
+    padding:30px;
+}
+
+.bottom{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:white;
+    border-top:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+    font-size:12px;
+    color:#777;
+}
+
+#toast{
+    position:fixed;
+    bottom:65px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#222;
+    color:white;
+    padding:12px 18px;
+    border-radius:8px;
+    display:none;
+    z-index:100;
+    max-width:90%;
+    text-align:center;
+}
+
+@media(max-width:600px){
+    header{
+        padding:0 12px;
+    }
+
+    main{
+        margin:20px auto;
+    }
+
+    h1{
+        font-size:24px;
+    }
+}
+</style>
 </head>
+
 <body>
-<header><div><b>🧠 My Memory</b><small id="status">Local mode</small></div><button id="loginBtn">Sign in</button></header>
-<nav>
-<button data-tab="home">🏠<span>Home</span></button><button data-tab="notes">📝<span>Notes</span></button>
-<button data-tab="tasks">✅<span>Tasks</span></button><button data-tab="calendar">📅<span>Calendar</span></button>
-<button data-tab="settings">☁️<span>Cloud</span></button>
-</nav>
+
+<header>
+    <div class="logo">
+        🧠 My Memory
+        <small id="modeText">Local mode</small>
+    </div>
+
+    <div>
+        <button id="loginBtn">Sign in</button>
+    </div>
+</header>
+
 <main>
-<section id="home" class="tab active"><h1>Today</h1><div id="homeItems"></div></section>
-<section id="notes" class="tab"><div class="top"><h1>Notes</h1><button class="primary" id="addNote">＋ Note</button></div><input id="noteSearch" placeholder="Search notes"><div id="notesList"></div></section>
-<section id="tasks" class="tab"><div class="top"><h1>Tasks</h1><button class="primary" id="addTask">＋ Task</button></div><select id="taskFilter"><option value="all">All</option><option value="pending">Pending</option><option value="done">Completed</option><option value="today">Today</option></select><div id="tasksList"></div></section>
-<section id="calendar" class="tab"><div class="top"><button id="prev">‹</button><h1 id="month"></h1><button id="next">›</button></div><div class="week">Sun Mon Tue Wed Thu Fri Sat</div><div id="cal"></div><div class="card"><b id="selected"></b><div id="selectedItems"></div></div></section>
-<section id="settings" class="tab"><h1>Cloud & Backup</h1>
-<div class="card"><b>Microsoft / OneDrive</b><p id="cloudInfo">Sign in to synchronize this data across devices.</p><button class="primary" id="sync">☁️ Sync now</button><button id="backup">⬆️ Backup to OneDrive</button><button id="restore">⬇️ Restore from OneDrive</button></div>
-<div class="card"><b>Local backup</b><p class="muted">Useful before clearing browser data.</p><button id="export">Export JSON</button><label class="button">Import JSON<input type="file" id="import" accept=".json" hidden></label></div>
-<div class="card"><b>App setup</b><p class="muted">Before using Microsoft login, put your Azure/Entra Application (client) ID into <code>config.js</code>.</p></div>
+
+<h1>Today</h1>
+
+<div class="tabs">
+    <button class="tab active" data-tab="home">🏠 Home</button>
+    <button class="tab" data-tab="notes">📝 Notes</button>
+    <button class="tab" data-tab="tasks">✅ Tasks</button>
+    <button class="tab" data-tab="calendar">📅 Calendar</button>
+    <button class="tab" data-tab="cloud">☁️ Cloud</button>
+</div>
+
+<!-- HOME -->
+<section id="home" class="panel active">
+
+    <div class="card">
+        <h2>Welcome</h2>
+        <p>Save your notes and tasks locally and synchronize them with your Microsoft OneDrive.</p>
+
+        <div class="status" id="status">
+            Not signed in
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Quick Actions</h3>
+
+        <div class="actions">
+            <button class="primary" onclick="openTab('notes')">
+                + Add Note
+            </button>
+
+            <button class="primary" onclick="openTab('tasks')">
+                + Add Task
+            </button>
+
+            <button class="secondary" onclick="syncCloud()">
+                ☁️ Sync
+            </button>
+
+            <button class="secondary" onclick="downloadBackup()">
+                💾 Backup
+            </button>
+        </div>
+    </div>
+
 </section>
+
+<!-- NOTES -->
+<section id="notes" class="panel">
+
+    <div class="card">
+
+        <h2>Add Note</h2>
+
+        <input
+            id="noteTitle"
+            type="text"
+            placeholder="Note title"
+        >
+
+        <textarea
+            id="noteBody"
+            placeholder="Write your note..."
+        ></textarea>
+
+        <div class="actions">
+
+            <button class="primary" onclick="addNote()">
+                Save Note
+            </button>
+
+            <button class="secondary" onclick="clearNoteForm()">
+                Clear
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Notes</h2>
+
+        <input
+            id="noteSearch"
+            type="search"
+            placeholder="Search notes..."
+            oninput="renderNotes()"
+        >
+
+        <div id="notesList"></div>
+
+    </div>
+
+</section>
+
+<!-- TASKS -->
+<section id="tasks" class="panel">
+
+    <div class="card">
+
+        <h2>Add Task</h2>
+
+        <input
+            id="taskTitle"
+            type="text"
+            placeholder="Task title"
+        >
+
+        <input
+            id="taskDue"
+            type="date"
+        >
+
+        <select id="taskPriority">
+            <option value="Low">Low Priority</option>
+            <option value="Medium" selected>Medium Priority</option>
+            <option value="High">High Priority</option>
+        </select>
+
+        <div class="actions">
+
+            <button class="primary" onclick="addTask()">
+                Save Task
+            </button>
+
+            <button class="secondary" onclick="clearTaskForm()">
+                Clear
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Tasks</h2>
+
+        <div id="tasksList"></div>
+
+    </div>
+
+</section>
+
+<!-- CALENDAR -->
+<section id="calendar" class="panel">
+
+    <div class="card">
+
+        <h2>Calendar</h2>
+
+        <input
+            id="calendarDate"
+            type="date"
+            onchange="renderCalendar()"
+        >
+
+        <div id="calendarList"></div>
+
+    </div>
+
+</section>
+
+<!-- CLOUD -->
+<section id="cloud" class="panel">
+
+    <div class="card">
+
+        <h2>Microsoft OneDrive</h2>
+
+        <p id="cloudMessage">
+            Sign in with Microsoft to enable cloud synchronization.
+        </p>
+
+        <div class="actions">
+
+            <button class="primary" onclick="signIn()">
+                🔐 Sign in
+            </button>
+
+            <button class="secondary" onclick="syncCloud()">
+                ☁️ Sync Now
+            </button>
+
+            <button class="secondary" onclick="downloadBackup()">
+                💾 Download Backup
+            </button>
+
+            <button class="danger" onclick="signOut()">
+                Sign out
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
 </main>
+
+<div class="bottom">
+    My Memory • Local + Microsoft OneDrive
+</div>
+
 <div id="toast"></div>
-<script src="config.js"></script><script src="app.js"></script>
-</body></html>
+
+
+<script>
+
+/* =========================================================
+   MICROSOFT ENTRA CONFIGURATION
+   ========================================================= */
+
+const CONFIG = {
+
+    clientId: "a1a7cc52-17d7-4058-be06-34ba4877fc20",
+
+    authority:
+        "https://login.microsoftonline.com/common",
+
+    redirectUri:
+        "https://gentle-sand-043016b00.3.azurestaticapps.net/",
+
+    scopes: [
+        "User.Read",
+        "Files.ReadWrite.AppFolder"
+    ]
+
+};
+
+
+/* =========================================================
+   LOCAL DATA
+   ========================================================= */
+
+const STORAGE_KEY = "my-memory-v3";
+
+let data = {
+    notes: [],
+    tasks: []
+};
+
+let account = null;
+let msalApp = null;
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function $(id){
+    return document.getElementById(id);
+}
+
+function today(){
+
+    return new Date()
+        .toISOString()
+        .slice(0,10);
+
+}
+
+function makeId(){
+
+    return Date.now().toString(36)
+        + Math.random()
+            .toString(36)
+            .slice(2);
+
+}
+
+function toast(message){
+
+    const t = $("toast");
+
+    t.textContent = message;
+    t.style.display = "block";
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer = setTimeout(() => {
+
+        t.style.display = "none";
+
+    }, 2500);
+
+}
+
+
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+
+function loadLocal(){
+
+    try{
+
+        const saved =
+            localStorage.getItem(STORAGE_KEY);
+
+        if(saved){
+
+            const parsed = JSON.parse(saved);
+
+            if(parsed.notes && parsed.tasks){
+
+                data = parsed;
+
+            }
+
+        }
+
+    }catch(e){
+
+        console.error(e);
+
+    }
+
+}
+
+function saveLocal(){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
+
+}
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+function openTab(name){
+
+    document.querySelectorAll(".panel")
+        .forEach(p => p.classList.remove("active"));
+
+    document.querySelectorAll(".tab")
+        .forEach(b => b.classList.remove("active"));
+
+    const panel = $(name);
+
+    if(panel){
+
+        panel.classList.add("active");
+
+    }
+
+    const button =
+        document.querySelector(
+            '.tab[data-tab="' + name + '"]'
+        );
+
+    if(button){
+
+        button.classList.add("active");
+
+    }
+
+    if(name === "notes") renderNotes();
+    if(name === "tasks") renderTasks();
+    if(name === "calendar") renderCalendar();
+
+}
+
+
+document.querySelectorAll(".tab")
+.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        openTab(button.dataset.tab);
+
+    });
+
+});
+
+
+/* =========================================================
+   NOTES
+   ========================================================= */
+
+function addNote(){
+
+    const title =
+        $("noteTitle").value.trim();
+
+    const body =
+        $("noteBody").value.trim();
+
+    if(!title && !body){
+
+        alert("Please enter a note.");
+
+        return;
+
+    }
+
+    data.notes.unshift({
+
+        id: makeId(),
+
+        title:
+            title || "Untitled Note",
+
+        body,
+
+        date: today(),
+
+        created:
+            new Date().toISOString()
+
+    });
+
+    saveLocal();
+
+    clearNoteForm();
+
+    renderNotes();
+
+    toast("Note saved");
+
+    cloudSaveIfSignedIn();
+
+}
+
+
+function clearNoteForm(){
+
+    $("noteTitle").value = "";
+    $("noteBody").value = "";
+
+}
+
+
+function renderNotes(){
+
+    const list = $("notesList");
+
+    const search =
+        ($("noteSearch").value || "")
+            .toLowerCase()
+            .trim();
+
+    let notes = data.notes;
+
+    if(search){
+
+        notes = notes.filter(n =>
+
+            (n.title || "")
+                .toLowerCase()
+                .includes(search)
+
+            ||
+
+            (n.body || "")
+                .toLowerCase()
+                .includes(search)
+
+        );
+
+    }
+
+    if(!notes.length){
+
+        list.innerHTML =
+            '<div class="empty">No notes found.</div>';
+
+        return;
+
+    }
+
+    list.innerHTML = notes.map(n => `
+
+        <div class="item">
+
+            <h3>${escapeHtml(n.title)}</h3>
+
+            <div class="meta">
+                ${escapeHtml(n.date || "")}
+            </div>
+
+            <p>${escapeHtml(n.body || "")}</p>
+
+            <div class="actions">
+
+                <button
+                    class="danger"
+                    onclick="deleteNote('${n.id}')">
+                    Delete
+                </button>
+
+            </div>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+function deleteNote(id){
+
+    if(!confirm("Delete this note?")) return;
+
+    data.notes =
+        data.notes.filter(n => n.id !== id);
+
+    saveLocal();
+
+    renderNotes();
+
+    toast("Note deleted");
+
+    cloudSaveIfSignedIn();
+
+}
+
+
+/* =========================================================
+   TASKS
+   ========================================================= */
+
+function addTask(){
+
+    const title =
+        $("taskTitle").value.trim();
+
+    if(!title){
+
+        alert("Enter a task title.");
+
+        return;
+
+    }
+
+    data.tasks.unshift({
+
+        id: makeId(),
+
+        title,
+
+        due:
+            $("taskDue").value || today(),
+
+        priority:
+            $("taskPriority").value,
+
+        done:false,
+
+        created:
+            new Date().toISOString()
+
+    });
+
+    saveLocal();
+
+    clearTaskForm();
+
+    renderTasks();
+
+    toast("Task saved");
+
+    cloudSaveIfSignedIn();
+
+}
+
+
+function clearTaskForm(){
+
+    $("taskTitle").value = "";
+
+    $("taskDue").value = "";
+
+    $("taskPriority").value = "Medium";
+
+}
+
+
+function renderTasks(){
+
+    const list = $("tasksList");
+
+    if(!data.tasks.length){
+
+        list.innerHTML =
+            '<div class="empty">No tasks.</div>';
+
+        return;
+
+    }
+
+    list.innerHTML = data.tasks.map(t => `
+
+        <div class="item">
+
+            <h3>
+                ${t.done ? "✅" : "⬜"}
+                ${escapeHtml(t.title)}
+            </h3>
+
+            <div class="meta">
+                Due: ${escapeHtml(t.due || "")}
+                • Priority: ${escapeHtml(t.priority || "")}
+            </div>
+
+            <div class="actions">
+
+                <button
+                    class="primary"
+                    onclick="toggleTask('${t.id}')">
+                    ${t.done ? "Mark Open" : "Complete"}
+                </button>
+
+                <button
+                    class="danger"
+                    onclick="deleteTask('${t.id}')">
+                    Delete
+                </button>
+
+            </div>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+function toggleTask(id){
+
+    const task =
+        data.tasks.find(t => t.id === id);
+
+    if(!task) return;
+
+    task.done = !task.done;
+
+    saveLocal();
+
+    renderTasks();
+
+    toast(
+        task.done
+            ? "Task completed"
+            : "Task reopened"
+    );
+
+    cloudSaveIfSignedIn();
+
+}
+
+
+function deleteTask(id){
+
+    if(!confirm("Delete this task?")) return;
+
+    data.tasks =
+        data.tasks.filter(t => t.id !== id);
+
+    saveLocal();
+
+    renderTasks();
+
+    toast("Task deleted");
+
+    cloudSaveIfSignedIn();
+
+}
+
+
+/* =========================================================
+   CALENDAR
+   ========================================================= */
+
+function renderCalendar(){
+
+    const date =
+        $("calendarDate").value || today();
+
+    $("calendarDate").value = date;
+
+    const notes =
+        data.notes.filter(n => n.date === date);
+
+    const tasks =
+        data.tasks.filter(t => t.due === date);
+
+    let html = "";
+
+    if(tasks.length){
+
+        html += "<h3>Tasks</h3>";
+
+        html += tasks.map(t => `
+
+            <div class="item">
+
+                ${t.done ? "✅" : "⬜"}
+                ${escapeHtml(t.title)}
+
+                <div class="meta">
+                    Priority: ${escapeHtml(t.priority)}
+                </div>
+
+            </div>
+
+        `).join("");
+
+    }
+
+    if(notes.length){
+
+        html += "<h3>Notes</h3>";
+
+        html += notes.map(n => `
+
+            <div class="item">
+
+                <h3>${escapeHtml(n.title)}</h3>
+
+                <p>${escapeHtml(n.body)}</p>
+
+            </div>
+
+        `).join("");
+
+    }
+
+    if(!html){
+
+        html =
+            '<div class="empty">Nothing scheduled for this date.</div>';
+
+    }
+
+    $("calendarList").innerHTML = html;
+
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+   ========================================================= */
+
+function escapeHtml(value){
+
+    return String(value || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================================================
+   MICROSOFT LOGIN
+   ========================================================= */
+
+async function initializeMicrosoft(){
+
+    try{
+
+        if(typeof msal === "undefined"){
+
+            console.error(
+                "Microsoft Authentication Library failed to load."
+            );
+
+            $("status").textContent =
+                "Microsoft login library could not load.";
+
+            return;
+
+        }
+
+
+        msalApp = new msal.PublicClientApplication({
+
+            auth:{
+
+                clientId:
+                    CONFIG.clientId,
+
+                authority:
+                    CONFIG.authority,
+
+                redirectUri:
+                    CONFIG.redirectUri,
+
+                navigateToLoginRequestUrl:false
+
+            },
+
+            cache:{
+
+                cacheLocation:"localStorage",
+
+                storeAuthStateInCookie:true
+
+            }
+
+        });
+
+
+        await msalApp.initialize();
+
+
+        const accounts =
+            msalApp.getAllAccounts();
+
+
+        if(accounts.length){
+
+            account = accounts[0];
+
+            msalApp.setActiveAccount(account);
+
+            setSignedInUI();
+
+        }
+
+
+        /*
+         * Handle redirect response if Microsoft
+         * ever returns through redirect flow.
+         */
+
+        try{
+
+            const response =
+                await msalApp.handleRedirectPromise();
+
+            if(response && response.account){
+
+                account = response.account;
+
+                msalApp.setActiveAccount(account);
+
+                setSignedInUI();
+
+            }
+
+        }catch(e){
+
+            console.warn(
+                "Redirect response:",
+                e
+            );
+
+        }
+
+
+    }catch(e){
+
+        console.error(
+            "MSAL initialization error:",
+            e
+        );
+
+        $("status").textContent =
+            "Microsoft login initialization failed.";
+
+    }
+
+}
+
+
+/* =========================================================
+   SIGN IN
+   ========================================================= */
+
+async function signIn(){
+
+    if(!msalApp){
+
+        alert(
+            "Microsoft login is not ready. Please refresh the page and try again."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await msalApp.loginPopup({
+
+                scopes: CONFIG.scopes,
+
+                prompt:"select_account"
+
+            });
+
+
+        account =
+            response.account;
+
+
+        msalApp.setActiveAccount(account);
+
+
+        setSignedInUI();
+
+
+        toast("Signed in successfully");
+
+
+        /*
+         * Load cloud data after login.
+         */
+
+        await cloudLoad();
+
+
+    }catch(error){
+
+        console.error(
+            "SIGN IN ERROR:",
+            error
+        );
+
+
+        let message =
+            error && error.message
+                ? error.message
+                : String(error);
+
+
+        alert(
+            "Microsoft sign-in failed:\n\n"
+            + message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SIGNED IN UI
+   ========================================================= */
+
+function setSignedInUI(){
+
+    if(!account) return;
+
+    $("loginBtn").textContent =
+        "Sign out";
+
+    $("status").textContent =
+        "Signed in: " + account.username;
+
+    $("modeText").textContent =
+        "Microsoft account connected";
+
+    $("cloudMessage").textContent =
+        "Connected to Microsoft OneDrive.";
+
+    $("loginBtn").onclick =
+        signOut;
+
+}
+
+
+/* =========================================================
+   SIGN OUT
+   ========================================================= */
+
+async function signOut(){
+
+    if(!msalApp) return;
+
+    try{
+
+        await msalApp.logoutPopup({
+
+            account:account
+
+        });
+
+    }catch(e){
+
+        console.warn(
+            "Logout popup failed:",
+            e
+        );
+
+    }
+
+
+    account = null;
+
+    $("loginBtn").textContent =
+        "Sign in";
+
+    $("loginBtn").onclick =
+        signIn;
+
+    $("status").textContent =
+        "Not signed in";
+
+    $("modeText").textContent =
+        "Local mode";
+
+    $("cloudMessage").textContent =
+        "Sign in with Microsoft to enable cloud synchronization.";
+
+    toast("Signed out");
+
+}
+
+
+/* =========================================================
+   MICROSOFT GRAPH TOKEN
+   ========================================================= */
+
+async function getAccessToken(){
+
+    if(!account){
+
+        throw new Error(
+            "Please sign in first."
+        );
+
+    }
+
+
+    try{
+
+        const response =
+            await msalApp.acquireTokenSilent({
+
+                scopes:
+                    CONFIG.scopes,
+
+                account:
+                    account
+
+            });
+
+        return response.accessToken;
+
+
+    }catch(silentError){
+
+        console.warn(
+            "Silent token failed. Opening popup.",
+            silentError
+        );
+
+
+        const response =
+            await msalApp.acquireTokenPopup({
+
+                scopes:
+                    CONFIG.scopes
+
+            });
+
+
+        return response.accessToken;
+
+    }
+
+}
+
+
+/* =========================================================
+   MICROSOFT GRAPH
+   ========================================================= */
+
+async function graph(path, options = {}){
+
+    const accessToken =
+        await getAccessToken();
+
+
+    const headers =
+        new Headers(
+            options.headers || {}
+        );
+
+
+    headers.set(
+        "Authorization",
+        "Bearer " + accessToken
+    );
+
+
+    if(
+        options.body &&
+        !headers.has("Content-Type")
+    ){
+
+        headers.set(
+            "Content-Type",
+            "application/json"
+        );
+
+    }
+
+
+    return fetch(
+        "https://graph.microsoft.com/v1.0" + path,
+        {
+            ...options,
+            headers
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CLOUD SAVE
+   =========================================================
+
+   IMPORTANT:
+   We use Microsoft's APP FOLDER.
+
+   This matches:
+   Files.ReadWrite.AppFolder
+
+   No normal /Apps/MyMemory folder is required.
+   ========================================================= */
+
+async function cloudSave(){
+
+    if(!account){
+
+        throw new Error(
+            "Please sign in first."
+        );
+
+    }
+
+
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    const response =
+        await graph(
+            "/me/drive/special/approot:/data.json:/content",
+            {
+                method:"PUT",
+                headers:{
+                    "Content-Type":
+                        "application/json"
+                },
+                body:blob
+            }
+        );
+
+
+    if(!response.ok){
+
+        const errorText =
+            await response.text();
+
+        throw new Error(
+            "OneDrive save failed: "
+            + errorText
+        );
+
+    }
+
+
+    toast(
+        "Saved to OneDrive"
+    );
+
+}
+
+
+/* =========================================================
+   CLOUD LOAD
+   ========================================================= */
+
+async function cloudLoad(){
+
+    if(!account) return;
+
+
+    try{
+
+        const response =
+            await graph(
+                "/me/drive/special/approot:/data.json:/content"
+            );
+
+
+        if(response.ok){
+
+            const cloudData =
+                await response.json();
+
+
+            if(
+                cloudData &&
+                Array.isArray(cloudData.notes) &&
+                Array.isArray(cloudData.tasks)
+            ){
+
+                data = cloudData;
+
+                saveLocal();
+
+                renderNotes();
+
+                renderTasks();
+
+                renderCalendar();
+
+                toast(
+                    "Cloud data loaded"
+                );
+
+            }
+
+        }else if(response.status === 404){
+
+            /*
+             * First login:
+             * file does not exist.
+             * Create it.
+             */
+
+            await cloudSave();
+
+        }else{
+
+            const errorText =
+                await response.text();
+
+            throw new Error(
+                errorText
+            );
+
+        }
+
+
+    }catch(error){
+
+        console.error(
+            "Cloud load error:",
+            error
+        );
+
+        alert(
+            "Cloud load failed:\n\n"
+            + error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOUD SYNC
+   ========================================================= */
+
+async function syncCloud(){
+
+    if(!account){
+
+        alert(
+            "Please sign in first."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        await cloudSave();
+
+        await cloudLoad();
+
+        toast(
+            "Sync completed"
+        );
+
+    }catch(error){
+
+        console.error(
+            "Sync error:",
+            error
+        );
+
+        alert(
+            "Sync failed:\n\n"
+            + error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   AUTOMATIC CLOUD SAVE
+   ========================================================= */
+
+async function cloudSaveIfSignedIn(){
+
+    if(!account) return;
+
+
+    try{
+
+        await cloudSave();
+
+    }catch(error){
+
+        console.warn(
+            "Automatic cloud save failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   DOWNLOAD BACKUP
+   ========================================================= */
+
+function downloadBackup(){
+
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const a =
+        document.createElement("a");
+
+
+    a.href = url;
+
+    a.download =
+        "my-memory-backup-"
+        + today()
+        + ".json";
+
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    URL.revokeObjectURL(url);
+
+
+    toast(
+        "Backup downloaded"
+    );
+
+}
+
+
+/* =========================================================
+   INITIAL START
+   ========================================================= */
+
+function start(){
+
+    loadLocal();
+
+    $("taskDue").value =
+        today();
+
+    $("calendarDate").value =
+        today();
+
+    renderNotes();
+
+    renderTasks();
+
+    renderCalendar();
+
+    initializeMicrosoft();
+
+}
+
+
+start();
+
+</script>
+
+</body>
+</html>
