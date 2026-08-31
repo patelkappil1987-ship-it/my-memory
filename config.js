@@ -1,8 +1,15 @@
-// Put your Microsoft Entra Application (client) ID here.
-// Example: const CONFIG = { clientId: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" };
+// My Memory — Microsoft Entra configuration
 const CONFIG = {
-  clientId: "PASTE-YOUR-MICROSOFT-CLIENT-ID-HERE",
+  clientId: "a1a7cc52-17d7-4058-be06-34ba4877fc20",
+
   authority: "https://login.microsoftonline.com/common",
-  redirectUri: window.location.origin + window.location.pathname,
-  scopes: ["User.Read", "Files.ReadWrite"]
+
+  // Microsoft Entra SPA redirect
+  redirectUri: window.location.origin,
+
+  // Permissions configured in Microsoft Entra
+  scopes: [
+    "User.Read",
+    "Files.ReadWrite.AppFolder"
+  ]
 };
