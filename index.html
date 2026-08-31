@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>My Memory — Notes, Tasks & Calendar</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
+<script src="https://alcdn.msauth.net/browser/2.39.0/js/msal-browser.min.js"></script>
+</head>
+<body>
+<header><div><b>🧠 My Memory</b><small id="status">Local mode</small></div><button id="loginBtn">Sign in</button></header>
+<nav>
+<button data-tab="home">🏠<span>Home</span></button><button data-tab="notes">📝<span>Notes</span></button>
+<button data-tab="tasks">✅<span>Tasks</span></button><button data-tab="calendar">📅<span>Calendar</span></button>
+<button data-tab="settings">☁️<span>Cloud</span></button>
+</nav>
+<main>
+<section id="home" class="tab active"><h1>Today</h1><div id="homeItems"></div></section>
+<section id="notes" class="tab"><div class="top"><h1>Notes</h1><button class="primary" id="addNote">＋ Note</button></div><input id="noteSearch" placeholder="Search notes"><div id="notesList"></div></section>
+<section id="tasks" class="tab"><div class="top"><h1>Tasks</h1><button class="primary" id="addTask">＋ Task</button></div><select id="taskFilter"><option value="all">All</option><option value="pending">Pending</option><option value="done">Completed</option><option value="today">Today</option></select><div id="tasksList"></div></section>
+<section id="calendar" class="tab"><div class="top"><button id="prev">‹</button><h1 id="month"></h1><button id="next">›</button></div><div class="week">Sun Mon Tue Wed Thu Fri Sat</div><div id="cal"></div><div class="card"><b id="selected"></b><div id="selectedItems"></div></div></section>
+<section id="settings" class="tab"><h1>Cloud & Backup</h1>
+<div class="card"><b>Microsoft / OneDrive</b><p id="cloudInfo">Sign in to synchronize this data across devices.</p><button class="primary" id="sync">☁️ Sync now</button><button id="backup">⬆️ Backup to OneDrive</button><button id="restore">⬇️ Restore from OneDrive</button></div>
+<div class="card"><b>Local backup</b><p class="muted">Useful before clearing browser data.</p><button id="export">Export JSON</button><label class="button">Import JSON<input type="file" id="import" accept=".json" hidden></label></div>
+<div class="card"><b>App setup</b><p class="muted">Before using Microsoft login, put your Azure/Entra Application (client) ID into <code>config.js</code>.</p></div>
+</section>
+</main>
+<div id="toast"></div>
+<script src="config.js"></script><script src="app.js"></script>
+</body></html>
