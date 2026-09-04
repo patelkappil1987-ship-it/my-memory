@@ -39,23 +39,47 @@ button{cursor:pointer;color:inherit}
 .round{width:52px;height:52px;border-radius:50%;background:#f4f4f5;display:grid;place-items:center}
 .round .icon{width:28px;height:28px}
 .view{border:0;background:none;padding:4px;font-size:19px}
-.list-card{padding:0 28px}
-.task{min-height:104px;display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
-.task:last-child{border-bottom:0}
-.check{width:35px;height:35px;border:2px solid #9ca1ab;border-radius:50%;background:#fff;display:grid;place-items:center;padding:0}
+.list-card{padding:14px}
+.task-section-title{display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:800;padding:12px 2px 7px}
+.task-section-title span{font-size:12px;color:#777;background:#f1f1f3;border-radius:12px;padding:4px 8px}
+.completed-section-title{margin-top:10px}
+.compact-empty{padding:12px 2px;font-size:14px}
+.task-count-header{display:flex;align-items:center;justify-content:space-between;padding:16px 2px 12px;margin-bottom:2px}
+.task-count-title{font-size:25px;font-weight:800}
+.task-counts{display:flex;gap:7px;align-items:center}
+.task-count{font-size:13px;font-weight:750;padding:7px 10px;border-radius:16px}
+.pending-count{background:#fff4df;color:var(--orange)}
+.complete-count{background:#eaf8ef;color:var(--green)}
+.completed-task{opacity:.78}
+.completed-task .task-title{text-decoration:line-through;color:#777}
+.task{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;min-height:72px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.task:last-child{border-bottom:0}.completed-task .task-meta{color:#999}
+.check{width:32px;height:32px;border:2px solid #9ca1ab;border-radius:50%;background:#fff;display:grid;place-items:center;padding:0}
 .check.done{border-color:#111;background:#111;color:#fff}
-.task-title{font-size:23px;font-weight:650;margin-bottom:6px}
-.task-meta{font-size:18px;color:#777d88;display:flex;gap:7px;align-items:center}
-.task-meta .icon{width:19px;height:19px}
-.priority{padding:10px 20px;border-radius:24px;font-size:18px;font-weight:800}
+.task-main{min-width:0}
+.task-summary{display:flex;align-items:center;gap:8px;min-width:0}
+.task-title{font-size:18px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task-meta{font-size:14px;color:#777d88;display:flex;gap:6px;align-items:center;margin-top:3px}
+.task-meta .icon{width:16px;height:16px}
+.task-details{display:none;padding:8px 0 3px;font-size:15px;line-height:1.4;color:#666c78;white-space:pre-wrap;word-break:break-word}
+.task.open .task-details{display:block}
+.expand-btn{width:30px;height:30px;border:0;background:transparent;font-size:20px;color:#777;display:grid;place-items:center;padding:0;transition:transform .18s}
+.task.open .expand-btn{transform:rotate(180deg)}
+.priority{padding:6px 11px;border-radius:18px;font-size:13px;font-weight:800;white-space:nowrap}
 .priority.low{background:#eaf8ef;color:var(--green)}
 .priority.medium{background:#fff4df;color:var(--orange)}
 .priority.high{background:#ffe7e7;color:var(--red)}
-.note{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:14px;padding:25px 24px}
-.note .round{width:56px;height:56px}
-.note-title{font-size:22px;font-weight:800}
-.note-body{font-size:19px;line-height:1.35;color:#666c78;margin-top:5px}
-.note-time{font-size:18px;color:#676d77;white-space:nowrap}
+.note{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.note:last-child{border-bottom:0}
+.note .round{width:42px;height:42px}
+.note-main{min-width:0}
+.note-summary{display:flex;align-items:center;gap:7px;min-width:0}
+.note-title{font-size:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-body{display:none;font-size:15px;line-height:1.4;color:#666c78;margin-top:7px;white-space:pre-wrap;word-break:break-word}
+.note.open .note-body{display:block}
+.note-time{font-size:14px;color:#676d77;white-space:nowrap}
+.note-expand{width:28px;height:28px;border:0;background:transparent;font-size:19px;color:#777;display:grid;place-items:center;padding:0;transition:transform .18s}
+.note.open .note-expand{transform:rotate(180deg)}
 
 .quick button{min-height:132px;border:1px solid #f0f0f2;border-radius:20px;background:#fff;box-shadow:0 5px 16px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;font-size:18px;font-weight:750}
 .quick .icon{width:38px;height:38px;stroke-width:1.8}
@@ -88,16 +112,20 @@ button{cursor:pointer;color:inherit}
   .voice-main{height:270px}
   .mic{width:116px;height:116px}.mic .icon{width:54px;height:54px}
   .voice-main h3{font-size:27px}.voice-main p{font-size:18px}
-  .task{min-height:91px;grid-template-columns:44px 1fr auto}.task-title{font-size:20px}.task-meta{font-size:16px}
-  .priority{padding:8px 15px;font-size:16px}
-  .note{grid-template-columns:58px 1fr auto;padding:20px 16px}.note-title{font-size:20px}.note-body{font-size:17px}.note-time{font-size:16px}
+  .task-section-title{font-size:14px;padding:10px 12px}.task-section{margin-bottom:12px;border-radius:14px}.task-section-title span{font-size:11px;padding:3px 7px}
+  .task-count-header{padding:12px 2px 9px}.task-count-title{font-size:21px}.task-count{font-size:11px;padding:6px 8px}.task-counts{gap:5px}
+  .task{grid-template-columns:34px minmax(0,1fr) auto auto}.task-date-badge{font-size:11px;gap:3px}.task-date-badge svg{width:14px;height:14px}.task-actions{gap:1px}
+
+  .task-dropdown-head{min-height:54px;font-size:18px;padding:0 4px}.task-dropdown-head b{min-width:29px;height:26px;font-size:12px}.task-dropdown-right{gap:8px}.task-chevron{font-size:20px}\n  .task{grid-template-columns:38px 1fr auto;min-height:66px;padding:8px 2px}.task-title{font-size:17px}.task-meta{font-size:13px}
+  .check{width:29px;height:29px}.priority{padding:5px 9px;font-size:12px}
+  .note{grid-template-columns:42px 1fr auto;padding:10px 12px}.note .round{width:38px;height:38px}.note-title{font-size:17px}.note-body{font-size:14px}.note-time{font-size:13px}
   .quick{gap:10px}.quick button{min-height:112px;font-size:15px}.quick .icon{width:31px;height:31px}
   .bottom button{font-size:13px}.bottom button .icon{width:29px;height:29px}
 }
 @media(max-width:390px){
   .app{padding-left:14px;padding-right:14px}
   .quick{gap:7px}.quick button{font-size:12px}
-  .task{grid-template-columns:40px 1fr auto}.task-title{font-size:18px}.priority{padding:7px 10px;font-size:14px}
+  .task{grid-template-columns:34px 1fr auto}.task-title{font-size:16px}.priority{padding:5px 8px;font-size:11px}
 }
 
 .add-card{display:grid;grid-template-columns:1fr 1fr;padding:12px}
@@ -127,6 +155,102 @@ button{cursor:pointer;color:inherit}
 .day-empty{padding:24px;text-align:center;color:#777;font-size:17px}
 .cal-grid .has-items{position:relative;font-weight:800}
 .cal-grid .has-items:after{content:"";position:absolute;bottom:5px;width:5px;height:5px;border-radius:50%;background:#111}
+.task-dropdown{border-bottom:1px solid #e5e5e7;background:#fff}.task-dropdown:first-child{border-top:1px solid #e5e5e7}.task-dropdown-head{width:100%;min-height:58px;border:0;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font:inherit;font-size:20px;font-weight:800;text-align:left;cursor:pointer}.task-dropdown-right{display:flex;align-items:center;gap:10px}.task-dropdown-head b{min-width:32px;height:28px;padding:0 9px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;font-size:13px}.pending-head{color:#a86700}.pending-head b{background:#fff4df;color:#a86700}.complete-head{color:#37804b}.complete-head b{background:#eaf8ef;color:#37804b}.task-chevron{font-size:21px;color:#777;transition:transform .18s}.task-dropdown.collapsed .task-chevron{transform:rotate(-90deg)}.task-dropdown.collapsed .task-dropdown-list{display:none}.task-dropdown-list{padding:0 2px 4px}.task-empty{padding:12px 6px;color:#888;font-size:14px}
+.task-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.task-date{white-space:nowrap}
+.task-date svg{flex-shrink:0}
+
+.task{grid-template-columns:38px minmax(0,1fr) auto auto;align-items:center}
+.task-main{min-width:0}
+.task-date-badge{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;color:#666;flex-shrink:0}
+.task-date-badge svg{width:16px;height:16px;flex-shrink:0}
+.task-actions{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.task-details{grid-column:2 / -1}
+
+/* FORCE VISIBLE TASK DATE */
+.task{
+  display:grid !important;
+  grid-template-columns:38px minmax(0,1fr) max-content max-content !important;
+  column-gap:10px !important;
+  row-gap:4px !important;
+  align-items:center !important;
+}
+.task-main{
+  min-width:0 !important;
+  grid-column:2 !important;
+}
+.task-date-badge{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  position:static !important;
+  width:auto !important;
+  min-width:max-content !important;
+  height:auto !important;
+  align-items:center !important;
+  gap:4px !important;
+  white-space:nowrap !important;
+  color:#555 !important;
+  font-size:13px !important;
+  line-height:1.2 !important;
+  flex-shrink:0 !important;
+}
+.task-date-badge span{
+  display:inline !important;
+  visibility:visible !important;
+}
+.task-date-badge svg{
+  display:block !important;
+  visibility:visible !important;
+  width:16px !important;
+  height:16px !important;
+  flex:none !important;
+}
+.task-actions{
+  display:flex !important;
+  visibility:visible !important;
+  align-items:center !important;
+  gap:3px !important;
+  flex-shrink:0 !important;
+}
+.task-details{
+  grid-column:2 / -1 !important;
+}
+
+@media(max-width:520px){
+  .task{
+    grid-template-columns:34px minmax(70px,1fr) max-content max-content !important;
+    column-gap:6px !important;
+  }
+  .task-date-badge{
+    font-size:11px !important;
+    gap:2px !important;
+  }
+  .task-date-badge svg{
+    width:14px !important;
+    height:14px !important;
+  }
+}
+
+.task-date-label{margin-top:6px}
+.task-date-control{
+  display:flex;align-items:center;gap:10px;
+  border:1px solid #d8d8d8;border-radius:18px;
+  padding:0 14px;background:#fff;min-height:58px;
+  box-sizing:border-box;
+}
+.task-calendar-icon{display:flex;align-items:center;justify-content:center;flex:none}
+.task-calendar-icon svg{width:21px;height:21px}
+#taskDate{
+  appearance:auto;-webkit-appearance:auto;
+  border:0;outline:0;background:transparent;
+  width:100%;min-width:0;height:54px;
+  font:inherit;color:#222;
+}
+#taskDate::-webkit-calendar-picker-indicator{opacity:1;display:block;width:22px;height:22px;cursor:pointer}
+
+/* Hide any accidental template placeholder from appearing in the UI */
+.task-calendar-icon .template-placeholder{display:none}
 </style>
 </head>
 <body>
@@ -170,6 +294,11 @@ button{cursor:pointer;color:inherit}
       <div class="card form" id="taskForm" style="display:none">
         <label>Task</label><input id="taskTitle" placeholder="Task name">
         <label>Priority</label><select id="taskPriority"><option>Low</option><option selected>Medium</option><option>High</option></select>
+        <label class="task-date-label" for="taskDate">Task Date</label>
+        <div class="task-date-control">
+          <span class="task-calendar-icon" aria-hidden="true">📅</span>
+          <input id="taskDate" type="date" aria-label="Select task date">
+        </div>
         <button class="primary" id="saveTaskBtn">Save Task</button>
       </div>
     </section>
@@ -261,23 +390,101 @@ function render(){
   if(document.getElementById("search")?.classList.contains("active")) renderHistory($("historySearch").value);
 }
 function renderTasks(id,home){
-  const el=$(id), list=data.tasks.filter(t=>!home||t.date===todayISO()).slice(0,home?3:100);
-  if(!list.length){el.innerHTML='<div class="empty">No tasks yet.</div>';return}
-  el.innerHTML=list.map(t=>`<div class="task">
+  const el=$(id);
+  const all = Array.isArray(data.tasks) ? data.tasks : [];
+  const pending = all.filter(t=>!t.done);
+  const complete = all.filter(t=>!!t.done);
+
+  if(home){
+    if(!pending.length){el.innerHTML='<div class="empty">No pending tasks.</div>';return}
+    el.innerHTML=pending.slice(0,3).map(t=>taskRow(t)).join("");
+    bindTaskActions(el);
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="task-dropdown" data-task-group="pending">
+      <button class="task-dropdown-head pending-head" data-toggle-task="pending">
+        <span>Pending</span>
+        <span class="task-dropdown-right"><b>${pending.length}</b><span class="task-chevron">⌄</span></span>
+      </button>
+      <div class="task-dropdown-list" id="pendingTaskList">
+        ${pending.length ? pending.map(t=>taskRow(t)).join("") : '<div class="task-empty">No pending tasks</div>'}
+      </div>
+    </div>
+
+    <div class="task-dropdown" data-task-group="complete">
+      <button class="task-dropdown-head complete-head" data-toggle-task="complete">
+        <span>Completed</span>
+        <span class="task-dropdown-right"><b>${complete.length}</b><span class="task-chevron">⌄</span></span>
+      </button>
+      <div class="task-dropdown-list" id="completeTaskList">
+        ${complete.length ? complete.map(t=>taskRow(t)).join("") : '<div class="task-empty">No completed tasks</div>'}
+      </div>
+    </div>`;
+
+  // Pending is open by default; Completed is collapsed.
+  const completeGroup = el.querySelector('[data-task-group="complete"]');
+  if(completeGroup) completeGroup.classList.add("collapsed");
+
+  el.querySelectorAll("[data-toggle-task]").forEach(btn=>btn.onclick=e=>{
+    e.preventDefault();
+    const group=btn.closest(".task-dropdown");
+    if(group) group.classList.toggle("collapsed");
+  });
+
+  bindTaskActions(el);
+}
+
+function bindTaskActions(el){
+  el.querySelectorAll("[data-done]").forEach(b=>b.onclick=async e=>{
+    e.stopPropagation();
+    const t=data.tasks.find(x=>String(x.id)===String(b.dataset.done));
+    if(!t)return;
+    t.done=!t.done;
+    await dbPut();
+    render();
+  });
+
+  el.querySelectorAll("[data-expand-task]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const row=el.querySelector(`[data-task-row="${b.dataset.expandTask}"]`);
+    if(row)row.classList.toggle("open");
+  });
+}
+function taskRow(t){
+  return `<div class="task ${t.done?"completed-task":""}" data-task-row="${t.id}">
     <button class="check ${t.done?"done":""}" data-done="${t.id}" aria-label="Complete">${t.done?ICONS.check:""}</button>
-    <div><div class="task-title">${esc(t.title)}</div><div class="task-meta">${ICONS.calendar}${fmtDate(t.date)}</div></div>
-    <span class="priority ${t.priority.toLowerCase()}">${t.priority}</span>
-  </div>`).join("");
-  el.querySelectorAll("[data-done]").forEach(b=>b.onclick=async()=>{let t=data.tasks.find(x=>x.id==b.dataset.done);t.done=!t.done;await dbPut();render()})
+    <div class="task-main">
+      <div class="task-title">${esc(t.title)}</div>
+    </div>
+    <div class="task-date-badge">${ICONS.calendar}<span>${fmtDate(t.date)}</span></div>
+    <div class="task-actions">
+      <span class="priority ${t.priority.toLowerCase()}">${t.priority}</span>
+      <button class="expand-btn" data-expand-task="${t.id}" aria-label="Show details">⌄</button>
+    </div>
+    <div class="task-details">${esc(t.title)}</div>
+  </div>`;
 }
 function renderNotes(id,home){
-  const el=$(id), list=data.notes.filter(n=>!home||n.date===todayISO()).slice(0,home?1:100);
+  const el=$(id), list=data.notes.filter(n=>!home||n.date===todayISO()).slice(0,home?3:100);
   if(!list.length){el.innerHTML='<div class="empty">No notes yet.</div>';return}
-  el.innerHTML=list.map(n=>`<div class="note">
+  el.innerHTML=list.map(n=>`<div class="note" data-note-row="${n.id}">
     <span class="round">${ICONS.note}</span>
-    <div><div class="note-title">${esc(n.title)}</div><div class="note-body">${esc(n.body)}</div></div>
-    <div class="note-time">${esc(n.time)}</div>
+    <div class="note-main">
+      <div class="note-summary"><div class="note-title">${esc(n.title)}</div></div>
+      <div class="note-body">${esc(n.body)}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:2px">
+      <div class="note-time">${esc(n.time)}</div>
+      <button class="note-expand" data-expand-note="${n.id}" aria-label="Show details">⌄</button>
+    </div>
   </div>`).join("");
+  el.querySelectorAll("[data-expand-note]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const row=el.querySelector(`[data-note-row="${b.dataset.expandNote}"]`);
+    if(row)row.classList.toggle("open");
+  });
 }
 function renderCalendar(){
   const y=currentDate.getFullYear(),m=currentDate.getMonth();
@@ -310,15 +517,32 @@ function renderSelectedDate(iso){
   tasks.forEach(t=>h+=`<div class="result-item"><div class="day-badge">Task · ${esc(t.priority)}</div><div class="result-title">${esc(t.title)}</div><div class="result-body">${t.done?"Completed":"Pending"}</div></div>`);
   $("selectedDateItems").innerHTML=h?`<div class="card selected-day">${h}</div>`:`<div class="card day-empty">No notes or tasks created on this date.</div>`;
 }
-  $("calGrid").innerHTML=h;
-}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
 document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(b.dataset.nav).classList.add("active");document.querySelectorAll(".bottom button").forEach(x=>x.classList.toggle("active",x.dataset.nav===b.dataset.nav));window.scrollTo({top:0,behavior:"smooth"})});
 $("addNoteBtn").onclick=()=>{$("noteForm").style.display="block";$("noteTitle").focus()}
 $("saveNoteBtn").onclick=async()=>{const title=$("noteTitle").value.trim(),body=$("noteBody").value.trim();if(!title&&!body)return;data.notes.unshift({id:Date.now(),title:title||"Untitled",body,date:todayISO(),time:timeNow()});await dbPut();$("noteTitle").value="";$("noteBody").value="";$("noteForm").style.display="none";render();toast("Note saved")}
 $("addTaskBtn").onclick=()=>{$("taskForm").style.display="block";$("taskTitle").focus()}
-$("saveTaskBtn").onclick=async()=>{const title=$("taskTitle").value.trim();if(!title)return;data.tasks.unshift({id:Date.now(),title,priority:$("taskPriority").value,date:todayISO(),done:false});await dbPut();$("taskTitle").value="";$("taskForm").style.display="none";render();toast("Task saved")}
+$("addTaskBtn").onclick=()=>{
+  $("taskForm").style.display="block";
+  const d=$("taskDate");
+  d.min=todayISO();
+  if(!d.value)d.value=todayISO();
+  $("taskTitle").focus();
+}
+$("saveTaskBtn").onclick=async()=>{
+  const title=$("taskTitle").value.trim();
+  const taskDate=$("taskDate").value;
+  if(!title){toast("Enter task name");return}
+  if(!taskDate){toast("Select task date");return}
+  data.tasks.unshift({id:Date.now(),title,priority:$("taskPriority").value,date:taskDate,done:false});
+  await dbPut();
+  $("taskTitle").value="";
+  $("taskDate").value=todayISO();
+  $("taskForm").style.display="none";
+  render();
+  toast("Task saved")
+}
 $("prevMonth").onclick=()=>{currentDate.setMonth(currentDate.getMonth()-1);renderCalendar()}
 $("nextMonth").onclick=()=>{currentDate.setMonth(currentDate.getMonth()+1);renderCalendar()}
 
