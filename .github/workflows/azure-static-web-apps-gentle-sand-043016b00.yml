@@ -16,7 +16,11 @@ jobs:
     name: Build and Deploy Job
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          lfs: false
 
       - name: Deploy Static App
         id: builddeploy
@@ -25,7 +29,6 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GENTLE_SAND_043016B00 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-
           app_location: "/"
           api_location: ""
           output_location: ""
