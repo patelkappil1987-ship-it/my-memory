@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#fff">
 <title>My Memory</title>
 <style>
 :root{
@@ -61,7 +61,7 @@ button{cursor:pointer;color:inherit}
 .quick .icon{width:38px;height:38px;stroke-width:1.8}
 .bottom{position:fixed;z-index:50;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,853px);height:var(--nav);background:rgba(255,255,255,.98);border-top:1px solid #e5e5e7;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 8px max(10px,env(safe-area-inset-bottom))}
 .bottom button{position:relative;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:16px;font-weight:800}
-
+.bottom button .icon{width:33px;height:33px}
 .bottom button.active:before{content:"";position:absolute;top:-7px;left:12%;right:12%;height:4px;background:#111;border-radius:0 0 3px 3px}
 .form{padding:22px}
 .form label{display:block;font-weight:800;margin:13px 0 7px}
@@ -73,7 +73,7 @@ button{cursor:pointer;color:inherit}
 .cal-head{display:flex;align-items:center;justify-content:space-between;font-size:21px;font-weight:850;margin-bottom:14px}
 .cal-head button{border:0;background:none;padding:8px}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.cal-grid div,.cal-grid button{aspect-ratio:1;display:grid;place-items:center;border-radius:12px;font-size:16px;font-weight:600;padding:0}
+.cal-grid div{aspect-ratio:1;display:grid;place-items:center;border-radius:12px;font-size:16px}
 .cal-grid .dow{font-weight:800;color:#777}
 .cal-grid .today{background:#111;color:#fff;font-weight:850}
 .data-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:20px}
@@ -92,7 +92,7 @@ button{cursor:pointer;color:inherit}
   .priority{padding:8px 15px;font-size:16px}
   .note{grid-template-columns:58px 1fr auto;padding:20px 16px}.note-title{font-size:20px}.note-body{font-size:17px}.note-time{font-size:16px}
   .quick{gap:10px}.quick button{min-height:112px;font-size:15px}.quick .icon{width:31px;height:31px}
-  .bottom button{font-size:13px}
+  .bottom button{font-size:13px}.bottom button .icon{width:29px;height:29px}
 }
 @media(max-width:390px){
   .app{padding-left:14px;padding-right:14px}
@@ -126,14 +126,8 @@ button{cursor:pointer;color:inherit}
 .day-badge{font-size:13px;font-weight:800;text-transform:uppercase;color:#777;margin-bottom:5px}
 .day-empty{padding:24px;text-align:center;color:#777;font-size:17px}
 .cal-grid .has-items{position:relative;font-weight:800}
-.cal-grid .has-items:after{content:"";position:absolute;bottom:5px;width:5px;height:5px;border-radius:50%;background:currentColor}
+.cal-grid .has-items:after{content:"";position:absolute;bottom:5px;width:5px;height:5px;border-radius:50%;background:#111}
 </style>
-
-<link rel="manifest" href="./manifest.webmanifest">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="My Memory">
 </head>
 <body>
 <div class="app">
@@ -218,11 +212,11 @@ button{cursor:pointer;color:inherit}
 </div>
 
 <nav class="bottom">
-  <button class="active" data-nav="home">HOME</button>
-  <button data-nav="notes">NOTES</button>
-  <button data-nav="tasks">TASKS</button>
-  <button data-nav="calendar">CALENDAR</button>
-  <button data-nav="data">DATA</button>
+  <button class="active" data-nav="home"><span id="homeIcon"></span>HOME</button>
+  <button data-nav="notes"><span id="bottomNoteIcon"></span>NOTES</button>
+  <button data-nav="tasks"><span id="bottomTaskIcon"></span>TASKS</button>
+  <button data-nav="calendar"><span id="bottomCalIcon"></span>CALENDAR</button>
+  <button data-nav="data"><span id="bottomFolderIcon"></span>DATA</button>
 </nav>
 
 <input type="file" id="fileInput" accept=".json,application/json" hidden>
@@ -243,21 +237,24 @@ const ICONS={
   home:`<svg class="icon" viewBox="0 0 24 24"><path d="m3 11 9-7 9 7v9H3z"/><path d="M9 20v-6h6v6"/></svg>`
 };
 const $=id=>document.getElementById(id);
-function icon(id,name){const el=$(id);if(el)el.innerHTML=ICONS[name]||""}
-icon("todayIcon","calendar");icon("folderIcon","folder");icon("saveIcon","save");icon("downloadIcon","download");if($("searchIcon"))$("searchIcon").innerHTML=SEARCH_ICON;if($("searchBoxIcon"))$("searchBoxIcon").innerHTML=SEARCH_ICON;
+function icon(id,name){const el=$(id);if(el) el.innerHTML=ICONS[name]||""}
+icon("todayIcon","calendar");icon("folderIcon","folder");icon("saveIcon","save");icon("downloadIcon","download");icon("homeIcon","home");$("searchIcon").innerHTML=SEARCH_ICON;$("searchBoxIcon").innerHTML=SEARCH_ICON;
+icon("quickNoteIcon","note");icon("quickTaskIcon","checkSquare");
+$("quickAddNote").onclick=()=>{$("noteForm").style.display="block";document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$("notes").classList.add("active");document.querySelectorAll(".bottom button").forEach(x=>x.classList.toggle("active",x.dataset.nav==="notes"));$("noteTitle").focus()};
+$("quickAddTask").onclick=()=>{$("taskForm").style.display="block";document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$("tasks").classList.add("active");document.querySelectorAll(".bottom button").forEach(x=>x.classList.toggle("active",x.dataset.nav==="tasks"));$("taskTitle").focus()};icon("bottomNoteIcon","note");icon("bottomTaskIcon","checkSquare");icon("bottomCalIcon","calendar");icon("bottomFolderIcon","folder");
 
 const DB="my-memory-db", STORE="app";
-let data={notes:[],tasks:[]}, currentDate=new Date();
+let data={notes:[],tasks:[]}, currentDate=new Date(), recognition=null, voiceMode="note";
 
 function toast(t){$("toast").textContent=t;$("toast").style.display="block";clearTimeout(window._toast);window._toast=setTimeout(()=>$("toast").style.display="none",1800)}
-function todayISO(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`}
+function todayISO(d=new Date()){return d.toISOString().slice(0,10)}
 function fmtDate(s){return new Date(s+"T00:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
 function timeNow(){return new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}
 
 function dbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function dbGet(){const db=await dbOpen();return new Promise((res,rej)=>{const r=db.transaction(STORE).objectStore(STORE).get("data");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function dbPut(){const db=await dbOpen();return new Promise((res,rej)=>{const r=db.transaction(STORE,"readwrite").objectStore(STORE).put(data,"data");r.onsuccess=res;r.onerror=()=>rej(r.error)})}
-async function load(){try{const x=await dbGet();if(x&&Array.isArray(x.notes)&&Array.isArray(x.tasks))data=x}catch(e){console.warn("Local database unavailable",e)}render()}
+async function load(){const x=await dbGet();if(x&&Array.isArray(x.notes)&&Array.isArray(x.tasks))data=x;render()}
 function render(){
   $("todayDate").textContent=new Date().toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
   renderTasks("tasksList",false);renderNotes("notesList",false);renderCalendar();
@@ -312,6 +309,8 @@ function renderSelectedDate(iso){
   notes.forEach(n=>h+=`<div class="result-item"><div class="day-badge">Note</div><div class="result-title">${esc(n.title)}</div><div class="result-body">${esc(n.body)}</div><div class="result-date">${esc(n.time)}</div></div>`);
   tasks.forEach(t=>h+=`<div class="result-item"><div class="day-badge">Task · ${esc(t.priority)}</div><div class="result-title">${esc(t.title)}</div><div class="result-body">${t.done?"Completed":"Pending"}</div></div>`);
   $("selectedDateItems").innerHTML=h?`<div class="card selected-day">${h}</div>`:`<div class="card day-empty">No notes or tasks created on this date.</div>`;
+}
+  $("calGrid").innerHTML=h;
 }
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
@@ -368,12 +367,6 @@ $("searchBtn").onclick=()=>{
 $("historySearch").oninput=e=>renderHistory(e.target.value);
 
 load();
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("Offline app setup:", err));
-  });
-}
 </script>
 </body>
 </html>
